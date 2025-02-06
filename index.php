@@ -1,5 +1,5 @@
 
-<?php
+<?php get_header();
 // Tạo WP_Query để lấy bài viết theo ngày giảm dần
 $args = array(
     'post_type'      => 'post',      // Lấy bài viết (post type là 'post')
@@ -13,7 +13,7 @@ if ($query->have_posts()){
     while ($query->have_posts()) {
      $query->the_post(); ?>
         <h2>
-            <?php the_title(); ?>
+            <a href="<?php the_permalink() ?>"><?php the_title(); ?></a>
         </h2>
         <div>
             <span>By <?php the_author(); ?></span>
@@ -24,6 +24,7 @@ if ($query->have_posts()){
         </div>
 
     <?php }
+    get_footer();
 } ?>
 
 
