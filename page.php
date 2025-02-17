@@ -26,7 +26,7 @@ if ($query->have_posts()){
                 <p>REPLACE ME LATER</p>
                 </div>
             </div>
-            </div>
+        </div>
 
             <div class="container container--narrow page-section">
                 <?php 
