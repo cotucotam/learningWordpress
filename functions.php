@@ -13,6 +13,10 @@
         register_nav_menu('footerLocationOne','Footer Location One');
         register_nav_menu('footerLocationTwo','Footer Location Two');
         add_theme_support('title-tag');
+        add_theme_support('post-thumbnails');
+        add_image_size('professorLandscape',400,260,true);
+        add_image_size('professorPortrait',280,450,true);
+        add_image_size('pageBanner',1500,350,true);
     }
     add_action('after_setup_theme', 'university_feater');
 
@@ -49,6 +53,21 @@
                 'singular_name' => 'Program'
             ),
             'menu_icon' => 'dashicons-awards'
+        ));
+
+        // Professor Post Type
+        register_post_type('professor', array(
+            'supports' => array('title','editor','thumbnail'),
+            'public' => true,
+            'show_in_rest' => true,
+            'labels' => array(
+                'name' => 'Professors',
+                'add_new_item' => 'Add New Professor',
+                'edit_item' => 'Edit Professor',
+                'all_items' => 'All Professors',
+                'singular_name' => 'Professor'
+            ),
+            'menu_icon' => 'dashicons-welcome-learn-more'
         ));
     }
     add_action('init','university_post_types');
