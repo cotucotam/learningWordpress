@@ -46,29 +46,14 @@
                   $eventMonth = 'Unknown';
                   $eventDay   = 'Unknown';
               }
-              ?>
-
-              <div class="event-summary">
-                <a class="event-summary__date t-center" href="<?php the_permalink();?>">
-                  <span class="event-summary__month"><?php echo $eventMonth?></span>
-                  <span class="event-summary__day"><?php echo $eventDay?></span>
-                </a>
-                <div class="event-summary__content">
-                  <h5 class="event-summary__title headline headline--tiny"><a href="<?php the_permalink();?>"><?php the_title(); ?></a></h5>
-                  <p>
-                    <?php 
-                      if (has_excerpt()){
-                        the_excerpt();
-                      } else{
-                        echo wp_trim_words(get_the_content(),18);
-                      }
-                    ?> 
-                    <a href="<?php the_permalink();?>" class="nu gray">Learn more</a>
-                  </p>
-                </div>
-              </div>
-
-            <?php }
+              $args = array(
+                'eventMonth' => $eventMonth,
+                'eventDay'  => $eventDay,
+              );
+            
+              set_query_var('event_data', $args);
+              get_template_part('tempalte_parts\event','excerpt');
+            }
           ?>
 
           <p class="t-center no-margin"><a href="<?php echo get_post_type_archive_link('event')?>" class="btn btn--blue">View All Events</a></p>
