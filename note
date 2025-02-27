@@ -1,0 +1,41 @@
+
+FIX for live reload / browser sync / browsersync
+7 upvotes
+Nate · Lecture 63 · 2 years ago
+I saw a bunch of people having problems with "Live Reload" here. I don't know if this course used Live Reload at one time, but it does not currently.
+
+What you need to do is this:
+
+
+
+1.  Install Browser Sync:
+
+npm install browser-sync
+
+
+2. Install NPM Run All:
+
+npm install npm-run-all
+
+
+3. Create a new file in the src folder called `browser-sync.config.js` with this code inside it:
+
+module.exports = {
+	proxy: "localhost:8888/Udemy/BradSchiff/BecomeAWPDev/",
+	notify: false,
+	files: ["build/css/*.min.css", "build/js/*.min.js", "**/*.php"],
+};
+NOTE: the value I have in there for proxy is exactly what my local dev address is for this course using MAMP. If you used Local by Flywheel or anything else, your local dev address will obviously be different.
+
+Then, open package.json and make sure your "scripts" section looks like this:
+
+"scripts": {
+    "watch-bs": "npm-run-all --parallel sync start",
+    "build": "wp-scripts build",
+    "start": "wp-scripts start",
+    "sync": "browser-sync start --config src/browser-sync.config.js",
+    "dev": "wp-scripts start",
+    "devFast": "wp-scripts start",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+Now, instead of running `npm run start` you will use `npm run watch-bs` to load up a new browser tab that automatically refreshes whenever you make changes to the PHP, CSS, or JS.

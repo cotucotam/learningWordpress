@@ -32,7 +32,14 @@
         wp_enqueue_style("google_fonts", "//fonts.googleapis.com/css?family=Roboto+Condensed:300,300i,400,400i,700,700i|Roboto:100,300,400,400i,700,700i");
         wp_enqueue_style('university_main_styles',get_theme_file_uri('build/style-index.css'));
         wp_enqueue_style('university_extra_styles',get_theme_file_uri('build/index.css'));
-        wp_enqueue_script("main_university_js", get_theme_file_uri("build/index.js"), array("jquery"), "1.0", true);
+        wp_enqueue_script("main-university-js", get_theme_file_uri("build/index.js"), array("jquery"), "1.0", true);
+        wp_enqueue_style('leaflet-css', 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css');
+        wp_enqueue_script('leaflet-js', 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js', [], false, true);
+        wp_enqueue_script('jquery');
+
+        wp_localize_script('main-university-js','universityData',array(
+            'root_url' => get_site_url()
+        ));
     }
     add_action('wp_enqueue_scripts','university_files');
 
@@ -49,6 +56,23 @@
     add_action('after_setup_theme', 'university_feater');
 
     function university_post_types(){
+        // Campus Post  Type
+        register_post_type('campus', array(
+            'rewrite' => array('slug' => 'campus'),
+            'supports' => array('title','editor','excerpt','custom-fields'),
+            'has_archive' => true,
+            'public' => true,
+            'show_in_rest' => true,
+            'labels' => array(
+                'name' => 'Campuss',
+                'add_new_item' => 'Add New Campus',
+                'edit_item' => 'Edit Campus',
+                'all_items' => 'All Campuses',
+                'singular_name' => 'Campus'
+            ),
+            'menu_icon' => 'dashicons-location-alt'
+        ));
+        
         // Event Post  Type
         register_post_type('event', array(
             'rewrite' => array('slug' => 'event'),
@@ -243,6 +267,5 @@
         }
     }
     add_action('pre_get_posts', 'university_adjust_queries');
-    
     
 ?>
