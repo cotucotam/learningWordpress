@@ -1,11 +1,16 @@
 <?php
 
     require get_theme_file_path('/inc/search-route.php');
+    require get_theme_file_path('/inc/like-route.php');
     
     function university_custom_rest(){
         register_rest_field('post', 'authorName',array(
             'get_callback'=> function(){return get_the_author();}
         ));
+
+        register_rest_field('note', 'userNoteCount', array(
+            'get_callback' => function() {return count_user_posts(get_current_user_id(), 'note');}
+          ));
     }
 
     add_action('rest_api_init', 'university_custom_rest');
@@ -43,14 +48,17 @@
         wp_enqueue_style("google_fonts", "//fonts.googleapis.com/css?family=Roboto+Condensed:300,300i,400,400i,700,700i|Roboto:100,300,400,400i,700,700i");
         wp_enqueue_style('university_main_styles',get_theme_file_uri('build/style-index.css'));
         wp_enqueue_style('university_extra_styles',get_theme_file_uri('build/index.css'));
-        wp_enqueue_script("main-university-js", get_theme_file_uri("build/index.js"), array("jquery"), "1.0", true);
+        // wp_enqueue_script("main-university-js", get_theme_file_uri("build/index.js"), array("jquery"), "1.0", true);
         wp_enqueue_style('leaflet-css', 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css');
         wp_enqueue_script('leaflet-js', 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js', [], false, true);
-        wp_enqueue_script('jquery');
+        // wp_enqueue_script('jquery');
 
-        wp_localize_script('main-university-js','universityData',array(
-            'root_url' => get_site_url()
-        ));
+        // wp_localize_script('main-university-js', 'universityData', array(
+        //     'root_url' => get_site_url(),
+        //     'nonce' => wp_create_nonce('wp_rest'),
+        //     'currentUserID' => get_current_user_id() 
+        // ));
+        
     }
     add_action('wp_enqueue_scripts','university_files');
 
@@ -135,6 +143,39 @@
                 'singular_name' => 'Professor'
             ),
             'menu_icon' => 'dashicons-welcome-learn-more'
+        ));
+
+        // Note Post Type
+        register_post_type('note', array(
+            'capability_type' => 'event',
+            'map_meta_cap' => true,
+            'supports' => array('title','editor'),
+            'public' => true,
+            'show_ui' => true,
+            'show_in_rest' => true,
+            'labels' => array(
+                'name' => 'Notes',
+                'add_new_item' => 'Add New Note',
+                'edit_item' => 'Edit Note',
+                'all_items' => 'All Notes',
+                'singular_name' => 'Note'
+            ),
+            'menu_icon' => 'dashicons-welcome-write-blog'
+        ));
+
+        // Like Post Type
+        register_post_type('like', array(
+            'supports' => array('title'),
+            'public' => true,
+            'show_ui' => true,
+            'labels' => array(
+                'name' => 'Likes',
+                'add_new_item' => 'Add New Like',
+                'edit_item' => 'Edit Like',
+                'all_items' => 'All Likes',
+                'singular_name' => 'Like'
+            ),
+            'menu_icon' => 'dashicons-heart'
         ));
     }
     add_action('init','university_post_types');
@@ -326,5 +367,25 @@
 
     function ourLoginTitle() {
     return get_bloginfo('name');
+    }
+    // Force note posts to be private
+
+    add_filter('wp_insert_post_data', 'makeNotePrivate', 10, 2);
+
+    function makeNotePrivate($data, $postarr) {
+    if ($data['post_type'] == 'note') {
+        if(count_user_posts(get_current_user_id(), 'note') > 4 AND !$postarr['ID']) {
+        die("You have reached your note limit.");
+        }
+
+        $data['post_content'] = sanitize_textarea_field($data['post_content']);
+        $data['post_title'] = sanitize_text_field($data['post_title']);
+    }
+
+    if($data['post_type'] == 'note' AND $data['post_status'] != 'trash') {
+        $data['post_status'] = "private";
+    }
+    
+    return $data;
     }
 ?>
